@@ -20,7 +20,17 @@ This project welcomes any kind of contribution! Here are a few suggestions:
 
 ## Code Style
 
-Use the RuboCop linter and integrate it into your IDE to maintain a common level of style.
+Use `cargo fmt` to format code and `cargo clippy` for linting. A `rustfmt` pre-commit hook is included to enforce formatting automatically.
+
+## Running Tests
+
+Run the full test suite with:
+
+```sh
+cargo test
+```
+
+This executes both unit tests (in `src/lib.rs`) and integration tests (in `tests/integration_test.rs`). All tests must pass before submitting a pull request.
 
 ## Project Governance
 
