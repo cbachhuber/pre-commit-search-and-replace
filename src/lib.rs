@@ -75,7 +75,8 @@ impl SearchAndReplace {
     }
 
     fn parse_file(&self, filename: &Path) -> FileMatches {
-        let file = fs::File::open(filename).unwrap_or_else(|_| panic!("Unable to open file: {:?}", filename));
+        let file = fs::File::open(filename)
+            .unwrap_or_else(|_| panic!("Unable to open file: {:?}", filename));
         let reader = BufReader::new(file);
         let mut all_occurrences = Vec::new();
         let mut temp_file: Option<NamedTempFile> = if self.replacement.is_some() {
