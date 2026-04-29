@@ -75,7 +75,7 @@ impl SearchAndReplace {
     }
 
     fn parse_file(&self, filename: &Path) -> FileMatches {
-        let file = fs::File::open(filename).expect(&format!("Unable to open file: {:?}", filename));
+        let file = fs::File::open(filename).unwrap_or_else(|_| panic!("Unable to open file: {:?}", filename));
         let reader = BufReader::new(file);
         let mut all_occurrences = Vec::new();
         let mut temp_file: Option<NamedTempFile> = if self.replacement.is_some() {
@@ -363,7 +363,7 @@ fn resolve_backreferences(replacement: &str, caps: &regex::Captures) -> String {
     // Replace named backreferences: \k<name>
     let named_re = Regex::new(r"\\k<([^>]+)>").unwrap();
     let names: Vec<String> = named_re
-        .captures_iter(&replacement)
+        .captures_iter(replacement)
         .map(|c| c[1].to_string())
         .collect();
     for name in names {
