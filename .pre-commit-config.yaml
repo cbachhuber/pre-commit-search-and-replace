@@ -2,41 +2,21 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-      # Git state
       - id: check-merge-conflict
-        stages: [pre-commit]
       - id: check-added-large-files
-        stages: [pre-commit]
-      # Sensitive information
       - id: detect-private-key
-        stages: [pre-commit]
       - id: detect-aws-credentials
         args:
           - --allow-missing-credentials
-        stages: [pre-commit]
-      # Generic file state
       - id: trailing-whitespace
-        stages: [pre-commit]
       - id: mixed-line-ending
-        stages: [pre-commit]
       - id: end-of-file-fixer
-        stages: [pre-commit]
       - id: check-executables-have-shebangs
-        stages: [pre-commit]
-      # Language syntax/formatting
       - id: check-yaml
-        stages: [pre-commit]
-  - repo: https://github.com/mattlqx/pre-commit-ruby
-    rev: v1.3.6
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
     hooks:
-      # Ruby conformance
-      - id: rubocop
-        args:
-          - --fix
-        exclude: Gemfile.lock
-        stages: [pre-commit]
-      - id: rspec
-        stages: [pre-commit]
+      - id: fmt
   - repo: https://github.com/mattlqx/pre-commit-sign
     rev: v1.2.0
     hooks:

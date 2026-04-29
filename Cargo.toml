@@ -1,0 +1,26 @@
+[package]
+name = "search-and-replace"
+version = "1.1.2"
+edition = "2021"
+authors = ["Chris Bachhuber"]
+license = "MIT"
+description = "A pre-commit hook that searches for strings and replaces them."
+homepage = "https://github.com/cbachhuber/pre-commit-search-and-replace"
+repository = "https://github.com/cbachhuber/pre-commit-search-and-replace"
+
+[[bin]]
+name = "search-and-replace"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+colored = "2"
+libc = "0.2"
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+tempfile = "3"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"

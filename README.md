@@ -1,8 +1,35 @@
 # pre-commit-search-and-replace
 
-This is a plugin for [pre-commit](https://pre-commit.com) that will run search and replace string operations against files to be committed. Note that this plugin operates on each line of a file therefore multiple line patterns are not supported.
+This is a plugin for [pre-commit](https://pre-commit.com) that will run search and replace string operations against files to be committed.
+Note that this plugin operates on each line of a file therefore multiple line patterns are not supported.
 
-### Usage
+This fork of the [Ruby original](https://github.com/mattlqx/pre-commit-search-and-replace) is written in Rust for fast, zero-runtime-dependency execution.
+
+## Installation
+
+### As a pre-commit hook
+
+Add to your `.pre-commit-config.yaml`:
+
+    - repo: https://github.com/cbachhuber/pre-commit-search-and-replace
+      rev: v1.1.2
+      hooks:
+      - id: search-and-replace
+
+pre-commit will build the Rust binary automatically via Cargo.
+
+### Standalone
+
+Build from source with [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html):
+
+    cargo install --path .
+
+Or build manually:
+
+    cargo build --release
+    # Binary is at target/release/search-and-replace
+
+## Usage
 
 By default, a YAML config file is loaded at `.pre-commit-search-and-replace.yaml` in the root of the repo. This config file should be a list of entries specifying any of the following keys:
 
@@ -12,16 +39,21 @@ By default, a YAML config file is loaded at `.pre-commit-search-and-replace.yaml
 - `extended`: boolean whether the regexp should be extended. default: `false`
 - `description`: short text description of purpose of the entry.
 
-The config file name can be changed by passing a `--config PATH` argument to the hook in the pre-commit config. A single search and replacement can be specified with `--search STRING` and `--replacement STRING` arguments as well instead of using a config file.
+The config file name can be changed by passing a `-c`/`--config PATH` argument to the hook in the pre-commit config. A single search and replacement can be specified with `-s`/`--search STRING` and `-r`/`--replacement STRING` arguments as well instead of using a config file.
 
 Other command line args:
-- `--[no-]write` - Whether to write replacements to the file.
-- `--[no-]color` - Whether to have output be colorized.
+
+- `-i`/`--insensitive` - Case-insensitive search.
+- `-e`/`--extended` - Extended regexp search.
+- `-w`/`--write`, `--no-write` - Whether to write replacements to the file. Default: true.
+- `-C`/`--color`, `--no-color` - Whether to have output be colorized. Default: true.
+
+The `NO_COLOR` environment variable is also respected to disable colored output.
 
 Example pre-commit config:
 
-    - repo: https://github.com/mattlqx/pre-commit-search-and-replace
-      rev: v1.1.9
+    - repo: https://github.com/cbachhuber/pre-commit-search-and-replace
+      rev: v1.1.2
       hooks:
       - id: search-and-replace
 
