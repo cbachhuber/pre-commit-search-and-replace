@@ -210,7 +210,12 @@ mod cli_tests {
         let tmp = copy_fixture_to_temp("good_content.txt");
         Command::cargo_bin("search-and-replace")
             .unwrap()
-            .args(["-s", "Something", "--no-color", tmp.path().to_str().unwrap()])
+            .args([
+                "-s",
+                "Something",
+                "--no-color",
+                tmp.path().to_str().unwrap(),
+            ])
             .assert()
             .code(0);
     }

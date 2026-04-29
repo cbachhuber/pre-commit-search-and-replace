@@ -10,7 +10,11 @@ use std::process;
 struct Cli {
     /// YAML config for multiple search and, optionally, replace operations.
     /// Default: .pre-commit-search-and-replace.yaml
-    #[arg(short = 'c', long = "config", default_value = ".pre-commit-search-and-replace.yaml")]
+    #[arg(
+        short = 'c',
+        long = "config",
+        default_value = ".pre-commit-search-and-replace.yaml"
+    )]
     config: String,
 
     /// Search string or regexp (required if not using config)
@@ -72,10 +76,7 @@ fn main() {
         .files
         .iter()
         .map(PathBuf::from)
-        .filter(|f| {
-            std::fs::canonicalize(f).ok()
-                != std::fs::canonicalize(config_path).ok()
-        })
+        .filter(|f| std::fs::canonicalize(f).ok() != std::fs::canonicalize(config_path).ok())
         .collect();
 
     // Load configs
@@ -118,20 +119,13 @@ fn main() {
                 continue;
             }
 
-            let description = entry
-                .description
-                .as_deref()
-                .unwrap_or(&entry.search);
+            let description = entry.description.as_deref().unwrap_or(&entry.search);
 
             println!(
                 "==== Found {} occurrences of \"{}\" in {}:\n",
                 result.len().to_string().red(),
                 description.yellow(),
-                result.occurrences[0]
-                    .file
-                    .display()
-                    .to_string()
-                    .cyan()
+                result.occurrences[0].file.display().to_string().cyan()
             );
 
             for occ in &result.occurrences {
@@ -165,10 +159,9 @@ fn main() {
                             let uid = metadata.uid();
                             let gid = metadata.gid();
                             unsafe {
-                                let c_path = std::ffi::CString::new(
-                                    src.to_string_lossy().as_bytes(),
-                                )
-                                .unwrap();
+                                let c_path =
+                                    std::ffi::CString::new(src.to_string_lossy().as_bytes())
+                                        .unwrap();
                                 libc::chown(c_path.as_ptr(), uid, gid);
                             }
                         }

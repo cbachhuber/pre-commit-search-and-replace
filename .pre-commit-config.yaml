@@ -22,6 +22,6 @@ repos:
     hooks:
       - id: sign-commit
   - repo: .
-    rev: v1.1.9
+    rev: c8082ae55d89274762e8ddb2c821d3c2bfc8da12
     hooks:
       - id: search-and-replace

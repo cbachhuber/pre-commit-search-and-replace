@@ -193,15 +193,15 @@ impl SearchAndReplace {
                             let abs_start = offset + m.start();
 
                             // Resolve backreferences in replacement
-                            let actual_replacement = self.replacement.as_ref().map(|repl| {
-                                resolve_backreferences(repl, &caps)
-                            });
+                            let actual_replacement = self
+                                .replacement
+                                .as_ref()
+                                .map(|repl| resolve_backreferences(repl, &caps));
 
                             // Check if replacement would change the line
                             if let Some(ref _repl) = self.replacement {
                                 let rust_repl = ruby_replacement_to_rust(_repl);
-                                let replaced =
-                                    re.replace_all(line, rust_repl.as_str()).to_string();
+                                let replaced = re.replace_all(line, rust_repl.as_str()).to_string();
                                 if replaced == line {
                                     break;
                                 }
@@ -343,9 +343,7 @@ fn ruby_replacement_to_rust(replacement: &str) -> String {
     // Replace numbered backreferences: \1 -> $1, \2 -> $2, etc.
     let numbered_re = Regex::new(r"\\(\d+)").unwrap();
     result = numbered_re
-        .replace_all(&result, |caps: &regex::Captures| {
-            format!("${}", &caps[1])
-        })
+        .replace_all(&result, |caps: &regex::Captures| format!("${}", &caps[1]))
         .to_string();
 
     result
@@ -385,8 +383,8 @@ fn case_insensitive_replace(line: &str, search: &str, replacement: &str) -> Stri
 
 /// Load configs from a YAML file.
 pub fn load_configs_from_yaml(path: &Path) -> Result<Vec<Config>, String> {
-    let content = fs::read_to_string(path)
-        .map_err(|_| format!("Unable to open {}", path.display()))?;
+    let content =
+        fs::read_to_string(path).map_err(|_| format!("Unable to open {}", path.display()))?;
     let configs: Vec<Config> =
         serde_yaml::from_str(&content).map_err(|e| format!("Failed to parse YAML: {}", e))?;
     Ok(configs)
@@ -429,10 +427,18 @@ mod tests {
 
     #[test]
     fn test_has_no_search_replace_comment() {
-        assert!(has_no_search_replace_comment("something # no-search-replace"));
-        assert!(has_no_search_replace_comment("something // no-search-replace"));
-        assert!(has_no_search_replace_comment("something /* no-search-replace */"));
-        assert!(has_no_search_replace_comment("something <!-- no-search-replace -->"));
+        assert!(has_no_search_replace_comment(
+            "something # no-search-replace"
+        ));
+        assert!(has_no_search_replace_comment(
+            "something // no-search-replace"
+        ));
+        assert!(has_no_search_replace_comment(
+            "something /* no-search-replace */"
+        ));
+        assert!(has_no_search_replace_comment(
+            "something <!-- no-search-replace -->"
+        ));
         assert!(!has_no_search_replace_comment("normal line"));
     }
 
