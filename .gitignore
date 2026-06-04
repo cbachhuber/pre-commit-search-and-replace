@@ -1,2 +1,5 @@
 /target
 coverage
+benchmark/results/*.json
+benchmark/results/*.md
+benchmark/vendor/

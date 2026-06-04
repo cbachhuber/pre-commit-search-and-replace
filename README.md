@@ -29,6 +29,80 @@ Or build manually:
     cargo build --release
     # Binary is at target/release/search-and-replace
 
+## Performance Benchmarks
+
+This repository includes two benchmark workflows:
+
+- Rust microbenchmarks (`cargo bench`) for core parsing/search paths.
+- Cold-start CLI comparison (`hyperfine`) against the upstream Ruby implementation.
+
+### 1) Rust Microbenchmarks
+
+Run:
+
+  cargo bench
+
+This executes Criterion benchmarks in `benches/performance.rs`, including:
+
+- Literal vs regex pattern parsing
+- Fixed fixture parsing scenarios
+- File-size scaling tests
+
+### 2) Cold-Start CLI Comparison (Rust vs Ruby Upstream)
+
+Prerequisites:
+
+- `hyperfine` installed
+- Rust binary built: `cargo build --release`
+- Optional Ruby baseline:
+  - Local clone of `https://github.com/mattlqx/pre-commit-search-and-replace`
+  - `bundle install` run in that clone
+
+Run Rust-only cold-start benchmark:
+
+  python3 scripts/benchmark_cold_start.py
+
+Run Rust vs Ruby comparison:
+
+  python3 scripts/benchmark_cold_start.py --ruby-repo /path/to/pre-commit-search-and-replace
+
+Results are written to:
+
+  benchmark/results/cold_start.json
+
+Generate a markdown comparison table from the JSON output:
+
+  python3 scripts/benchmark_results_to_markdown.py
+
+Write the table to a file instead of stdout:
+
+  python3 scripts/benchmark_results_to_markdown.py --output benchmark/results/cold_start.md
+
+### GitHub Action (Automated Setup)
+
+If you prefer not to install Rust, Ruby, Bundler, and hyperfine locally, use the
+manual benchmark workflow in [benchmark workflow](.github/workflows/benchmark.yml).
+
+From GitHub:
+
+- Go to Actions -> Benchmark -> Run workflow
+- Optionally set `warmup`, `min_runs`, and `ruby_ref`
+
+The workflow will:
+
+- Build the Rust release binary
+- Clone and set up the upstream Ruby implementation
+- Run the cold-start comparison with hyperfine
+- Generate `cold_start.json` and `cold_start.md`
+- Upload results as workflow artifacts and add the markdown table to the job summary
+
+### Benchmark Notes
+
+- These benchmarks are manual by design and are not PR-blocking CI checks.
+- Cold-start numbers vary by machine, filesystem state, and background load.
+- Use the same hardware and similar system load when comparing before/after changes.
+- Ratios in the markdown report are computed against the selected baseline tool (default: `rust`).
+
 ## Usage
 
 By default, a YAML config file is loaded at `.pre-commit-search-and-replace.yaml` in the root of the repo. This config file should be a list of entries specifying any of the following keys:

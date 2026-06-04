@@ -32,6 +32,40 @@ cargo test
 
 This executes both unit tests (in `src/lib.rs`) and integration tests (in `tests/integration_test.rs`). All tests must pass before submitting a pull request.
 
+## Running Benchmarks
+
+Performance benchmarks are manual and intended for local regression checks.
+
+Run Rust microbenchmarks:
+
+```sh
+cargo bench
+```
+
+Run cold-start benchmark for the local Rust binary:
+
+```sh
+cargo build --release
+python3 scripts/benchmark_cold_start.py
+```
+
+Run Rust vs upstream Ruby comparison:
+
+```sh
+python3 scripts/benchmark_cold_start.py --ruby-repo /path/to/pre-commit-search-and-replace
+```
+
+Generate a markdown summary table from benchmark JSON:
+
+```sh
+python3 scripts/benchmark_results_to_markdown.py
+```
+
+To run the full Rust-vs-Ruby benchmark without local setup, use the manual workflow in
+`.github/workflows/benchmark.yml` from the GitHub Actions UI.
+
+The cold-start benchmark requires `hyperfine`. Results are written to `benchmark/results/cold_start.json`.
+
 ## Project Governance
 
 **This is an [OPEN Open Source Project](http://openopensource.org/).**

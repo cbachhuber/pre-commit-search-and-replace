@@ -1,0 +1,92 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      warmup:
+        description: Hyperfine warmup runs
+        required: false
+        default: "2"
+      min_runs:
+        description: Hyperfine minimum runs
+        required: false
+        default: "5"
+      ruby_ref:
+        description: Branch, tag, or SHA for mattlqx/pre-commit-search-and-replace
+        required: false
+        default: "main"
+
+permissions:
+  contents: read
+
+jobs:
+  cold-start:
+    name: Cold-start Rust vs Ruby
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y hyperfine
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Clone upstream Ruby implementation
+        run: |
+          mkdir -p benchmark/vendor
+          git clone --depth 1 --branch "${{ github.event.inputs.ruby_ref }}" \
+            https://github.com/mattlqx/pre-commit-search-and-replace.git \
+            benchmark/vendor/pre-commit-search-and-replace
+
+      - name: Install Ruby benchmark dependencies
+        run: |
+          gem install bundler -v 2.5.10 --no-document
+          cd benchmark/vendor/pre-commit-search-and-replace
+          bundle _2.5.10_ config set --local path vendor/bundle
+          bundle _2.5.10_ install
+
+      - name: Run cold-start benchmark
+        run: |
+          python3 scripts/benchmark_cold_start.py \
+            --ruby-repo benchmark/vendor/pre-commit-search-and-replace \
+            --warmup "${{ github.event.inputs.warmup }}" \
+            --min-runs "${{ github.event.inputs.min_runs }}" \
+            --output benchmark/results/cold_start.json
+
+      - name: Generate markdown report
+        run: |
+          python3 scripts/benchmark_results_to_markdown.py \
+            --input benchmark/results/cold_start.json \
+            --output benchmark/results/cold_start.md
+
+      - name: Publish workflow summary
+        run: |
+          echo "## Cold-start Benchmark (Rust vs Ruby)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          cat benchmark/results/cold_start.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-start-benchmark-results
+          path: |
+            benchmark/results/cold_start.json
+            benchmark/results/cold_start.md
